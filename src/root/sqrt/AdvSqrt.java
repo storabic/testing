@@ -37,12 +37,12 @@ public class AdvSqrt extends Sqrt {
             x = Double.longBitsToDouble(b);
             res = x;
 
-            while (Math.abs(x - res * res) / x > eps) {
+            while (Math.abs(x - res * res) / x > eps && i < 6) {
                 i++;
                 tmp = res;
                 res = (tmp + x / tmp) / 2;
             }
-
+            res = (res + x / res) / 2;
             b = Double.doubleToLongBits(res);
             d = (int) Math.ceil((double) d / 2) + sqdgadd;
             if (dnr) d -= dgshift / 2;

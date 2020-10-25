@@ -5,9 +5,8 @@ import org.testng.annotations.*;
 import static org.testng.Assert.*;
 
 public class AdvSqrtTest {
-    AdvSqrt advSqrt;
-    Sqrt defaultSqrt;
-
+    private AdvSqrt advSqrt;
+    private Sqrt defaultSqrt;
 
     @BeforeSuite
     public void setUp() {
@@ -16,15 +15,39 @@ public class AdvSqrtTest {
     }
 
     /**
-     * 1.
+     * Method-helper
+     * @param actual   first double value
+     * @param expected second double value
+     * @return boolean true if one double is equal to other or one step away in mantissa
+     */
+    private boolean checkEquality(double actual, double expected) {
+        long advSqrtBits = Double.doubleToLongBits(actual);
+        long defaultSqrtBits = Double.doubleToLongBits(expected);
+        long difference = Math.abs(advSqrtBits - defaultSqrtBits);
+        return difference <= 1;
+    }
+
+    /**
+     * 1. Checking result of AdvSqrt sqrt for non-negative double numbers is equal to default sqrt result
+     * or one step away in mantissa from default sqrt result
      */
     @Test
-    public void testSqrtDefault() {
-        advSqrt.sqrt(29);
-//        for (double i = 10; i <= 100; ++i) {
-//            System.out.println(i);
-//                advSqrt.sqrt(i);
-//        }
+    public void testDefault() {
+        //some dummy numbers
+        for (double i = 0; i < 10087; ++i)
+            assertTrue(checkEquality(advSqrt.sqrt(i), defaultSqrt.sqrt(i)));
+
+        //normalized numbers
+        double[] normalized = new double[]{Double.longBitsToDouble(0x0421234567890123L),
+                Double.longBitsToDouble(0x0790000000000000L), Double.longBitsToDouble(0x0010000000000000L)};
+        for (double n : normalized)
+            assertTrue(checkEquality(advSqrt.sqrt(n), defaultSqrt.sqrt(n)));
+
+        //denormalized numbers
+        double[] denormalized = new double[]{Double.longBitsToDouble(0x0001234567890123L),
+                Double.longBitsToDouble(0x0001234567890123L)};
+        for (double d : denormalized)
+            assertTrue(checkEquality(advSqrt.sqrt(d), defaultSqrt.sqrt(d)));
     }
 
     /**
